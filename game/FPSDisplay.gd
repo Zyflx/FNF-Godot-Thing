@@ -1,6 +1,5 @@
 extends Label
 
-var times:Array[float] = [];
 var current_fps:int = 0
 
 func _ready() -> void:
