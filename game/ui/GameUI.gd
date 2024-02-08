@@ -33,7 +33,8 @@ func _process(_delta:float) -> void:
 func update_score_txt() -> void:
 	var acc:float = Util.round_decimal(accuracy, 2)
 	var rank:String = determine_rank(acc)
-	score_txt.text = 'Score: ' + str(game.score) + ' | Misses: ' + str(game.misses) + ' | Accuracy: [' + str(acc) + '% | ' + rank + ']'
+	var text:String = 'Score: %s | Misses: %s | Accuracy: [%s%% | %s]'
+	score_txt.text = text % [game.score, game.misses, acc, rank]
 	
 func update_accuracy(rating:int, missed:bool = false) -> void:
 	played += 1
