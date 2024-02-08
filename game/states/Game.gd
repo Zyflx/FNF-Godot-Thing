@@ -13,7 +13,12 @@ var player_strums:Array[StrumNote] = []
 var cpu_strums:Array[StrumNote] = []
 
 # controls
-var keys_array:Array[String] = ['A', 'S', 'K', 'L']
+var keys_array = [
+	InputMap.action_get_events('NoteLeft'),
+	InputMap.action_get_events('NoteDown'),
+	InputMap.action_get_events('NoteUp'),
+	InputMap.action_get_events('NoteRight')
+]
 # var last_key:int = 0 # unused
 
 # data
@@ -52,7 +57,7 @@ func _ready() -> void:
 	song_data = Conductor.parse_json('minacious')
 	
 	Conductor.init_music(song_data)
-	Conductor.play_music()
+	# Conductor.play_music()
 	Conductor.set_bpm(song_data.bpm)
 	
 	generate_chart(song_data)
@@ -156,9 +161,7 @@ func generate_chart(data) -> void:
 		
 func _input(event) -> void:
 	if event is InputEventKey:
-		var key_str:String = OS.get_keycode_string(event.keycode)
-		var key:int = get_key(key_str)
-		
+		var key:int = get_key(event.physical_keycode)
 		if key < 0: return
 		
 		var control_array:Array[bool] = [
@@ -196,10 +199,12 @@ func _input(event) -> void:
 		else:
 			player_strums[key].play_anim('static')
 	
-func get_key(key:String) -> int:
+func get_key(key:int) -> int:
 	for i in keys_array.size():
-		if keys_array[i].to_upper() == key:
-			return i
+		for event in keys_array[i]:
+			if event is InputEventKey:
+				if key == event.physical_keycode:
+					return i
 	return -1
 	
 func get_rating(diff:float = 0.0) -> RatingData:
