@@ -198,7 +198,7 @@ func _input(event) -> void:
 	
 func get_key(key:String) -> int:
 	for i in keys_array.size():
-		if keys_array[i] == key:
+		if keys_array[i].to_upper() == key:
 			return i
 	return -1
 	
