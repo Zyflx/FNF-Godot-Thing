@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://5idjffrhxtas"]
+
+[ext_resource type="Script" path="res://game/states/Sustain Test.gd" id="1_k01mp"]
+
+[node name="Sustain Test" type="Node2D"]
+script = ExtResource("1_k01mp")

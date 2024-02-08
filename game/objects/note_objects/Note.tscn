@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3 uid="uid://bm5a8tg8it6t8"]
+
+[ext_resource type="Script" path="res://game/objects/note_objects/Note.gd" id="1_mer1s"]
+[ext_resource type="Texture2D" uid="uid://b8y3tdbhi1r56" path="res://assets/images/notes/normal notes/blue0000.png" id="1_pwuwq"]
+[ext_resource type="Texture2D" uid="uid://qi1o2dug2555" path="res://assets/images/notes/normal notes/green0000.png" id="2_nhehy"]
+[ext_resource type="Texture2D" uid="uid://jqkvs5knnmvr" path="res://assets/images/notes/normal notes/purple0000.png" id="3_exqxl"]
+[ext_resource type="Texture2D" uid="uid://bqillyaljytgi" path="res://assets/images/notes/normal notes/red0000.png" id="4_s4pvn"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pvpmd"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_pwuwq")
+}],
+"loop": false,
+"name": &"blue",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_nhehy")
+}],
+"loop": false,
+"name": &"green",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_exqxl")
+}],
+"loop": false,
+"name": &"purple",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_s4pvn")
+}],
+"loop": false,
+"name": &"red",
+"speed": 0.0
+}]
+
+[node name="Note" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_pvpmd")
+animation = &"red"
+script = ExtResource("1_mer1s")

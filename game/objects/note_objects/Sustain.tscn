@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://d2stnhocsoy8k"]
+
+[ext_resource type="Script" path="res://game/objects/Sustain.gd" id="1_bcgfx"]
+
+[node name="Sustain" type="TextureRect"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_bcgfx")

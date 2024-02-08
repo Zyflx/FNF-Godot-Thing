@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://d044qgcclxrse"]
+
+[ext_resource type="Script" path="res://game/FPSDisplay.gd" id="2_owm4y"]
+
+[node name="FpsDisplay" type="Label"]
+offset_right = 1.0
+script = ExtResource("2_owm4y")
