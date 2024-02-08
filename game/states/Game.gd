@@ -1,3 +1,4 @@
+class_name Game
 extends Node2D
 
 # cameras
@@ -27,6 +28,7 @@ var note_data
 
 # note stuff
 var notes:Array[Note] = []
+var note_index:int = 0
 
 # rating stuff
 enum RatingData {UNDEFINED = 0, TIER1 = 1, TIER2 = 2, TIER3 = 3, TIER4 = 4}
@@ -57,10 +59,15 @@ func _ready() -> void:
 	song_data = Conductor.parse_json('minacious')
 	
 	Conductor.init_music(song_data)
-	Conductor.play_music()
 	Conductor.set_bpm(song_data.bpm)
 	
-	generate_chart(song_data)
+	var thread:Thread = Thread.new()
+	thread.start(generate_chart.bind(song_data))
+	await thread.wait_to_finish()
+	
+	Conductor.play_music()
+	
+	# generate_chart(song_data)
 	
 	# print([song_data.song, Conductor.bpm, get_tree().current_scene.name])
 	
@@ -83,21 +90,22 @@ func _ready() -> void:
 func _process(_delta:float) -> void:
 	# note spawning
 	if note_data != null:
-		while note_data.size() > 0 and note_data[0][0] - Conductor.time < 1800 / song_data.speed:
-			if note_data[0][0] - Conductor.time > 1800 / song_data.speed:
+		while note_data.size() > 0 and note_index != note_data.size() and note_data[note_index][0] - Conductor.time < 1800 / song_data.speed:
+			if note_data[note_index][0] - Conductor.time > 1800 / song_data.speed:
 				break
 			
 			var new_note:Note = Note_Node.instantiate()
-			new_note.is_sustain = note_data[0][2]
-			new_note.sustain_length = note_data[0][3]
-			new_note.time = note_data[0][0]
-			new_note.data = note_data[0][1] % 4
-			new_note.must_hit = note_data[0][4]
+			new_note.is_sustain = note_data[note_index][2]
+			new_note.sustain_length = note_data[note_index][3]
+			new_note.time = note_data[note_index][0]
+			new_note.data = note_data[note_index][1] % 4
+			new_note.must_hit = note_data[note_index][4]
 			new_note.spawned = true
-			note_data.pop_at(0)
+			# note_data.pop_at(0)
 			notes.append(new_note)
 			notes.sort_custom(sort_notes)
 			cam_notes.add_child(new_note)
+			note_index += 1
 			
 	if notes != null and notes.size() > 0:
 		for note in notes:
@@ -145,11 +153,15 @@ func spawn_rating(diff:float) -> void:
 func start_countdown() -> void:
 	pass
 	
+func song_ended() -> void:
+	get_tree().reload_current_scene()
+	
 func generate_chart(data) -> void:
 	note_data = []
 	for sec in data.notes:
 		for note in sec.sectionNotes:
 			var time:float = maxf(0, note[0])
+			if note[2] is String: continue
 			var sustain_length:float = maxf(0, note[2])
 			var is_sustain:bool = sustain_length > 0
 			var n_data:int = int(note[1])
