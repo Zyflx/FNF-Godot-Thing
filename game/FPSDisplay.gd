@@ -1,6 +1,6 @@
 extends Label
 
-var current_fps:int = 0
+var current_fps:float = 0
 
 func _ready() -> void:
 	position = Vector2(10, 10);
