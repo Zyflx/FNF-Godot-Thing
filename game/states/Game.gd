@@ -57,7 +57,7 @@ func _ready() -> void:
 	song_data = Conductor.parse_json('minacious')
 	
 	Conductor.init_music(song_data)
-	# Conductor.play_music()
+	Conductor.play_music()
 	Conductor.set_bpm(song_data.bpm)
 	
 	generate_chart(song_data)
