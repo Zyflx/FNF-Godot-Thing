@@ -30,25 +30,29 @@ func init_music(data) -> void:
 	stream_voices = get_tree().current_scene.get_node('VoicesPlayer')
 	stream_voices.stream = Util.get_voices(data.song)
 		
-func play_music():
+func play_music() -> void:
 	if stream_voices != null:
 		stream_voices.play()
 	if stream_inst != null:
 		stream_inst.play()
+		
+func stop_music() -> void:
+	if stream_voices != null:
+		stream_voices.stop()
+	if stream_inst != null:
+		stream_inst.stop()
+		
+func sync_stream(stream:AudioStreamPlayer) -> void:
+	if stream != null and stream.is_playing():
+		if absf(stream.get_playback_position() * 1000.0 - time) > 20.0:
+			stream.seek(time * 0.001)
 	
 func parse_json(song_name:String):
 	var path:String = 'res://assets/songs/' + song_name + '/charts/normal.json'
-	
 	# if the file doesn't exist, stop the function so the game doesn't die lol
-	if not FileAccess.file_exists(path):
-		return
-	
+	if not FileAccess.file_exists(path): return
 	var file:FileAccess = FileAccess.open(path, FileAccess.READ)
-	var chart = JSON.parse_string(file.get_as_text())
-	
-	# print(chart.song.song)
-	
-	return chart.song
+	return JSON.parse_string(file.get_as_text()).song
 	
 func _ready() -> void:
 	var game:Node2D = get_tree().current_scene
@@ -58,25 +62,10 @@ func _process(delta:float) -> void:
 	time += delta * 1000.0
 	
 	if time > 0:
-		# vocal syncing
-		if stream_voices != null and stream_voices.is_playing() and stream_inst.is_playing():
-			var voice_time:float = stream_voices.get_playback_position() * 1000.0
-			var inst_time:float = stream_inst.get_playback_position() * 1000.0
-			if absf(voice_time - time) > 20.0:
-				stream_voices.seek(time * 0.001)
-			if absf(inst_time - time) > 20.0:
-				stream_inst.seek(time * 0.001)
-		else:
-			# if the song doesn't have a voices file, sync the inst only
-			if stream_inst != null and stream_inst.is_playing():
-				var inst_time:float = stream_inst.get_playback_position() * 1000.0
-				if absf(inst_time - time) > 20.0:
-					stream_inst.seek(time * 0.001)
-					
+		# vocal and inst syncing
+		sync_stream(stream_inst)
+		sync_stream(stream_voices)	
 		if stream_inst != null and time >= stream_inst.stream.get_length() * 1000.0:
 			song_ended.emit()
-			stream_inst.stop()
-			if stream_voices != null:
-				stream_voices.stop()
+			stop_music()
 			time = 0.0
-			
