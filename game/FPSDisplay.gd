@@ -12,5 +12,6 @@ func _process(_delta:float) -> void:
 	
 	var mem:String = String.humanize_size(OS.get_static_memory_usage())
 	var mem_peak:String = String.humanize_size(OS.get_static_memory_peak_usage())
+	var scene:String = 'None' if get_tree().current_scene == null else get_tree().current_scene.name
 	
-	text = 'FPS: ' + str(current_fps) + '\nMemory: ' + mem + ' / ' + mem_peak + '\nScene: ' + get_tree().current_scene.name
+	text = 'FPS: ' + str(current_fps) + '\nMemory: ' + mem + ' / ' + mem_peak + '\nScene: ' + scene

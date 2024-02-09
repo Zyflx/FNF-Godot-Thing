@@ -4,6 +4,7 @@ extends Node
 signal beat_hit(beat) # triggers every beat hit
 signal step_hit(step) # triggers every step hit
 signal bpm_changed(new_bpm) # triggered when the bpm changes
+signal song_ended() # triggered when the song ends
 
 # conductor stuff
 const SIXTY:float = 0.0166666667
@@ -56,7 +57,8 @@ func parse_json(song_name:String):
 	return chart.song
 	
 func _ready() -> void:
-	pass
+	var game:Node2D = get_tree().current_scene
+	song_ended.connect(game.song_ended)
 
 func _process(delta:float) -> void:
 	time += delta * 1000.0
@@ -76,4 +78,11 @@ func _process(delta:float) -> void:
 				var inst_time:float = stream_inst.get_playback_position() * 1000.0
 				if absf(inst_time - time) > 20.0:
 					stream_inst.seek(time * 0.001)
+					
+		if stream_inst != null and time >= stream_inst.stream.get_length() * 1000.0:
+			song_ended.emit()
+			stream_inst.stop()
+			if stream_voices != null:
+				stream_voices.stop()
+			time = 0.0
 			
