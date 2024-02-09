@@ -25,8 +25,8 @@ func set_bpm(new_bpm:float) -> void:
 	bpm = new_bpm
 	
 func init_music(data) -> void:
-	var inst_path:String = 'res://assets/songs/' + data.song + '/audio/Inst.ogg'
-	var voices_path:String = 'res://assets/songs/' + data.song + '/audio/Voices.ogg'
+	var inst_path:String = 'res://assets/songs/' + data.song.replace(' ', '-') + '/audio/Inst.ogg'
+	var voices_path:String = 'res://assets/songs/' + data.song.replace(' ', '-') + '/audio/Voices.ogg'
 	
 	if FileAccess.file_exists(inst_path):
 		stream_inst = get_tree().current_scene.get_node('MusicPlayer')
