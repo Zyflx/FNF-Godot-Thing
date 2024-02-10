@@ -29,7 +29,7 @@ func _ready() -> void:
 	if is_sustain:
 		sustain = TextureRect.new()
 		sustain.texture = Util.get_texture('notes/sustains/' + color_array[data] + ' hold piece')
-		sustain.size = Vector2(sustain.texture.get_width(), .45 * speed * sustain_length)
+		sustain.size = Vector2(sustain.texture.get_width(), .54 * speed * sustain_length)
 		sustain.scale.y = -1
 		sustain.position.x = sustain.texture.get_width() * 0.5 - 50
 		sustain.show_behind_parent = true
