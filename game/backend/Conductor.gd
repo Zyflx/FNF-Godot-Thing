@@ -44,7 +44,8 @@ func stop_music() -> void:
 		
 func sync_stream(stream:AudioStreamPlayer) -> void:
 	if stream != null and stream.is_playing():
-		if absf(stream.get_playback_position() * 1000.0 - time) > 20.0:
+		var stream_time:float = stream.get_playback_position() * 1000.0
+		if absf(stream_time - time) > 20.0:
 			stream.seek(time * 0.001)
 	
 func parse_json(song_name:String):
@@ -53,18 +54,14 @@ func parse_json(song_name:String):
 	if not FileAccess.file_exists(path): return
 	var file:FileAccess = FileAccess.open(path, FileAccess.READ)
 	return JSON.parse_string(file.get_as_text()).song
-	
-func _ready() -> void:
-	var game:Node2D = get_tree().current_scene
-	song_ended.connect(game.song_ended)
 
 func _process(delta:float) -> void:
 	time += delta * 1000.0
 	
-	if time > 0:
+	if time >= 0:
 		# vocal and inst syncing
 		sync_stream(stream_inst)
-		sync_stream(stream_voices)	
+		sync_stream(stream_voices)
 		if stream_inst != null and time >= stream_inst.stream.get_length() * 1000.0:
 			song_ended.emit()
 			stop_music()

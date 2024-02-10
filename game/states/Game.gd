@@ -60,16 +60,13 @@ func _ready() -> void:
 	
 	Conductor.init_music(song_data)
 	Conductor.set_bpm(song_data.bpm)
+	Conductor.song_ended.connect(song_ended)
 	
 	var thread:Thread = Thread.new()
 	thread.start(generate_chart.bind(song_data))
 	await thread.wait_to_finish()
 	
 	Conductor.play_music()
-	
-	# generate_chart(song_data)
-	
-	# print([song_data.song, Conductor.bpm, get_tree().current_scene.name])
 	
 	cam_notes.layer = -2
 	cam_hud.layer = -1
@@ -87,7 +84,7 @@ func _ready() -> void:
 		else: cpu_strums.append(strum_note)
 		cam_notes.add_child(strum_note)
 
-func _process(_delta:float) -> void:
+func _process(delta:float) -> void:
 	# note spawning
 	if note_data != null:
 		while note_data.size() > 0 and note_index != note_data.size() and note_data[note_index][0] - Conductor.time < 1800 / song_data.speed:
@@ -100,6 +97,7 @@ func _process(_delta:float) -> void:
 			new_note.time = note_data[note_index][0]
 			new_note.data = note_data[note_index][1] % 4
 			new_note.must_hit = note_data[note_index][4]
+			new_note.speed = song_data.speed
 			new_note.spawned = true
 			# note_data.pop_at(0)
 			notes.append(new_note)
@@ -112,9 +110,15 @@ func _process(_delta:float) -> void:
 			if note != null and note.spawned:
 				var strum:StrumNote = player_strums[note.data] if note.must_hit else cpu_strums[note.data]
 				
-				note.position.x = strum.position.x
-				note.position.y = strum.position.y + (Conductor.time - note.time) * (0.45 * song_data.speed)
-					
+				note.lock_to_strum(strum, song_data.speed)
+				
+				if note.is_sustain:
+					note.sustain.material.set_shader_parameter('strum_coords', Vector2(strum.position.x, strum.position.y))
+					if note.self_modulate.a == 0 and not note.must_hit:
+						note.sustain_length -= delta * 1000.0
+						if note.sustain_length <= 0:
+							destroy_note(note)
+				
 				if not note.must_hit and note.was_good_hit:
 					cpu_note_hit(note)
 				
@@ -130,7 +134,8 @@ func player_note_hit(note:Note) -> void:
 func cpu_note_hit(note:Note) -> void:
 	cpu_strums[note.data].play_anim(cpu_strums[note.data].dir_to_name() + ' confirm')
 	cpu_strums[note.data].reset_time = 0.10
-	destroy_note(note)
+	if not note.is_sustain: destroy_note(note)
+	else: note.self_modulate.a = 0
 					
 func note_miss(note:Note) -> void:
 	misses += 1
@@ -168,8 +173,8 @@ func generate_chart(data) -> void:
 			var must_hit:bool = sec.mustHitSection if note[1] <= 3 else not sec.mustHitSection
 			
 			note_data.append([time, n_data, is_sustain, sustain_length, must_hit])
-			note_data.sort()
-			# print(note_data)
+			
+	note_data.sort()
 		
 func _input(event) -> void:
 	if event is InputEventKey:
@@ -183,11 +188,9 @@ func _input(event) -> void:
 			Input.is_action_just_pressed('NoteRight')
 		]
 		
-		var hittable_notes:Array[Note] = []
-		
-		for i in notes:
-			if i != null and i.spawned and i.must_hit and i.can_be_hit and i.data == key and not i.was_good_hit and not i.can_cause_miss:
-				hittable_notes.append(i)
+		var hittable_notes:Array[Note] = notes.filter(func(n:Note):
+			return n.spawned and n.can_be_hit and n.data == key and not n.was_good_hit and not n.can_cause_miss
+		)
 		
 		if control_array[key]:
 			if hittable_notes.size() > 0:

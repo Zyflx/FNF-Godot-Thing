@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cckv0dvbnd4gv"]
+
+[ext_resource type="Shader" path="res://game/materials/Sustain Clip.gdshader" id="1_6k4bo"]
+
+[resource]
+shader = ExtResource("1_6k4bo")
+shader_parameter/strum_coords = null

@@ -13,7 +13,9 @@ var can_be_hit:bool = false
 var was_good_hit:bool = false
 var can_cause_miss:bool = false
 
-var sustain:Sustain
+var speed:float = 0
+
+var sustain:TextureRect
 
 var color_array:Array[String] = ['purple', 'blue', 'green', 'red']
 
@@ -23,6 +25,24 @@ func _ready() -> void:
 	
 	if data % 4 == 3 and not is_sustain:
 		flip_v = true
+		
+	if is_sustain:
+		sustain = TextureRect.new()
+		sustain.texture = Util.get_texture('notes/sustains/' + color_array[data] + ' hold piece')
+		sustain.size = Vector2(sustain.texture.get_width(), .45 * speed * sustain_length)
+		sustain.scale.y = -1
+		sustain.position.x = sustain.texture.get_width() * 0.5 - 50
+		sustain.show_behind_parent = true
+		sustain.material = load('res://game/materials/Sustain Clip.tres')
+		add_child(sustain)
+		
+		var sustain_end:Sprite2D = Sprite2D.new()
+		sustain_end.texture = Util.get_texture('notes/sustains/' + color_array[data] + ' hold end')
+		sustain_end.position.y -= sustain.size.y
+		sustain_end.scale.y = -1
+		sustain_end.show_behind_parent = true
+		sustain_end.material = load('res://game/materials/Sustain Clip.tres')
+		add_child(sustain_end)
 
 func _process(_delta:float) -> void:
 	if must_hit:
@@ -34,3 +54,7 @@ func _process(_delta:float) -> void:
 		can_be_hit = false
 		if time <= Conductor.time:
 			was_good_hit = true
+			
+func lock_to_strum(strum:StrumNote, speed:float) -> void:
+	position.x = strum.position.x
+	position.y = strum.position.y + (Conductor.time - time) * (0.45 * speed)
