@@ -14,3 +14,8 @@ func get_voices(song:String) -> AudioStreamOggVorbis:
 	var path:String = 'res://assets/songs/' + song.replace(' ', '-').to_lower() + '/audio/Voices.ogg'
 	if FileAccess.file_exists(path): return load(path)
 	return null
+
+func get_texture(image:String) -> Texture2D:
+	var path:String = 'res://assets/images/' + image + '.png'
+	if FileAccess.file_exists(path): return load(path)
+	return null
